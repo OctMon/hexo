@@ -2,6 +2,7 @@
 title: flutter配置多个环境
 date: 2020-06-10 21:37:50
 tags: flutter
+categories: app
 ---
 
 复制一份默认的flutter环境，并修改文件夹为：flutter_dev
