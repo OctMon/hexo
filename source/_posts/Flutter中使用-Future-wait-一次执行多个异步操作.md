@@ -1,7 +1,7 @@
 ---
 title: flutter中使用 Future.wait 一次执行多个异步操作
 date: 2020-06-09 11:09:28
-tags: fluttre
+tags: flutter
 categories: app
 ---
 
