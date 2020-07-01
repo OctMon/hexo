@@ -5,7 +5,7 @@ tags: flutter
 categories: app
 ---
 
-经验证，flutter build iOS打出的ipa包太大，用xcodebuild打包正常，支持代码混淆。iOS如果因为签名原因打包失败，先用Xcode正常打一次就行。
+经验证，flutter build iOS打出的ipa包太大，用xcodebuild打包正常，支持设置代码混淆。iOS如果因为签名原因打包失败，先用Xcode正常打一次就行。
 
 直接上脚本：
 
@@ -26,6 +26,11 @@ flutter clean
 
 echo "开始获取 packages 插件资源"
 flutter packages get
+
+# 不使用代码混淆
+#obfuscate=""
+# 开启代码混淆
+obfuscate="--obfuscate --split-debug-info=app"
 
 # iOS
 build_ios() {
@@ -74,7 +79,7 @@ funcExpertOptionFile() {
     then
         rm -rf "$path_export_options"
     fi
-    
+
     /usr/libexec/PlistBuddy -c "Add :compileBitcode bool $compileBitcode" "$path_export_options"
     /usr/libexec/PlistBuddy -c "Add :signingStyle string $signingStyle" "$path_export_options"
     /usr/libexec/PlistBuddy -c "Add :method string $methodStyle" "$path_export_options"
@@ -89,7 +94,7 @@ then
     xcodebuild clean -workspace ${project}.xcworkspace \
         -scheme ${project} \
         -configuration ${configuration}
-    
+
     ## 归档
     xcodebuild archive -workspace ${project}.xcworkspace \
         -scheme ${project} \
@@ -100,7 +105,7 @@ else
     xcodebuild clean -project ${project}.xcworkspace \
         -scheme ${project} \
         -configuration ${configuration}
-    
+
     ## 归档
     xcodebuild archive -project ${project}.xcworkspace \
         -scheme ${project} \
@@ -158,7 +163,7 @@ cd ..
 ##==================================apk==================================
 if [[ ${platform} -ne 2 ]]; then
     echo "开始build apk"
-    flutter build apk --obfuscate --split-debug-info=app --release --verbose #--no-codesign
+    flutter build apk $obfuscate --release --verbose #--no-codesign
     echo "build apk已完成"
 
     file_apk=android-$(date "+%Y%m%d%H%M").apk
@@ -181,12 +186,11 @@ fi
 ##==================================ipa==================================
 if [[ ${platform} -ne 1 ]]; then
     echo "开始build ios"
-    flutter build ios --obfuscate --split-debug-info=app --release --verbose #--no-codesign
+    flutter build ios $obfuscate --release --verbose #--no-codesign
     echo "build ios已完成"
 
     build_ios
 fi
 ##==================================ipa==================================
-
 ```
 
