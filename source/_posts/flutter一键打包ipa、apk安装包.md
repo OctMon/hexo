@@ -1,5 +1,5 @@
 ---
-title: flutter一键打包ipa、apk安装包
+title: flutter一键打包ipa、apk安装包 上传蒲公英
 date: 2020-06-22 20:44:05
 tags: flutter
 categories: app
@@ -16,6 +16,18 @@ SECONDS=0
 # 打包类型 1:android 2:ios any:其它全部
 platform=0
 
+## 蒲公英 APIKey  https://www.pgyer.com/account/api
+pgyer_api_key=""
+## 蒲公英 下载地址后缀
+pgyer_subfix_url=""
+## 蒲公英 安装密码
+pgyer_pwd=""
+
+# 不使用代码混淆
+#obfuscate=""
+# 开启代码混淆
+obfuscate="--obfuscate --split-debug-info=app"
+
 # 选择打包类型
 read -n1 -p "设置打包类型 1:android 2:ios any:其它全部 (5s后自动执全部打包) [1/2/any]? " -t 5 answer
 platform=${answer}
@@ -26,11 +38,6 @@ flutter clean
 
 echo "开始获取 packages 插件资源"
 flutter packages get
-
-# 不使用代码混淆
-#obfuscate=""
-# 开启代码混淆
-obfuscate="--obfuscate --split-debug-info=app"
 
 # iOS
 build_ios() {
@@ -138,8 +145,25 @@ then
     echo "** Finished export. Elapsed time: ${SECONDS}s **"
     rm -rf "$path_build"
     echo $file_ipa
-    open $path_app
     say "iOS打包成功"
+
+    if [[ -n "${pgyer_api_key}" ]]
+        then
+            #上传到pgyer
+            echo "正在上传到蒲公英..."
+            echo
+            curl -F "file=@${file_ipa}" -F "_api_key=${pgyer_api_key}" -F "buildInstallType=2" -F "buildPassword=${pgyer_pwd}" -F "buildUpdateDescription=脚本自动上传" https://www.pgyer.com/apiv2/app/upload
+            # rm -rf ${file_ipa}
+            echo
+            say "iOS上传蒲公英成功"
+            echo
+            if [[ -n "${pgyer_subfix_url}" ]]
+            then
+                open https://www.pgyer.com/${pgyer_subfix_url}
+            fi
+    else
+      open $path_app
+    fi
 else
     echo "遇到报错了😭, 打开Xcode查找错误原因"
     say "iOS打包失败"
@@ -172,8 +196,25 @@ if [[ ${platform} -ne 2 ]]; then
 
     if [[ -f app/${file_apk} ]]
         then
-        open app
         say "android打包成功"
+
+        if [[ -n "${pgyer_api_key}" ]]
+        then
+            #上传到pgyer
+            echo "正在上传到蒲公英..."
+            echo
+            curl -F "file=@app/${file_apk}" -F "_api_key=${pgyer_api_key}" -F "buildInstallType=2" -F "buildPassword=${pgyer_pwd}" -F "buildUpdateDescription=脚本自动上传" https://www.pgyer.com/apiv2/app/upload
+            # rm -rf app/${file_ipa}
+            echo
+            say "android上传蒲公英成功"
+            echo
+            if [[ -n "${pgyer_subfix_url}" ]]
+            then
+                open https://www.pgyer.com/${pgyer_subfix_url}
+            fi
+      else
+        open app
+      fi
     else
         echo "遇到报错了😭, 打开Android Studio查找错误原因"
         say "android打包失败"
@@ -192,5 +233,6 @@ if [[ ${platform} -ne 1 ]]; then
     build_ios
 fi
 ##==================================ipa==================================
+
 ```
 
