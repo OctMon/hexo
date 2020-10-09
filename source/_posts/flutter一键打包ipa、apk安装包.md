@@ -16,6 +16,8 @@ SECONDS=0
 # 打包类型 1:android 2:ios any:其它全部
 platform=0
 
+# Xcode12开始需要设置导出ipa的名字
+project_name="flutter_easy_example"
 ## 蒲公英 APIKey  https://www.pgyer.com/account/api
 pgyer_api_key=""
 ## 蒲公英 下载地址后缀
@@ -137,7 +139,12 @@ xcodebuild  -exportArchive \
 
 ## ipa路径
 file_ipa="${path_app}/${project}-$(date "+%Y%m%d%H%M").ipa"
-mv "${path_app}/${project}.ipa" "${file_ipa}"
+if [[ -n "${project_name}" ]]
+  then
+      mv "${path_app}/${project_name}.ipa" "${file_ipa}"
+  else
+      mv "${path_app}/${project}.ipa" "${file_ipa}"
+fi
 
 ## 判断导出ipa结果
 if [ -f "${file_ipa}" ]
@@ -159,7 +166,7 @@ then
             echo
             if [[ -n "${pgyer_subfix_url}" ]]
             then
-                open https://www.pgyer.com/${pgyer_subfix_url}
+            open https://www.pgyer.com/${pgyer_subfix_url}
             fi
     else
       open $path_app
@@ -210,7 +217,7 @@ if [[ ${platform} -ne 2 ]]; then
             echo
             if [[ -n "${pgyer_subfix_url}" ]]
             then
-                open https://www.pgyer.com/${pgyer_subfix_url}
+            open https://www.pgyer.com/${pgyer_subfix_url}
             fi
       else
         open app
